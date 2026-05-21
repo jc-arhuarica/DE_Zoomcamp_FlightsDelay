@@ -1,17 +1,9 @@
-
-# Name your project! Project names should contain only lowercase characters
-# and underscores. A good package name should reflect your organization's
-# name or the intended use of these models
-name: 'cr_dbt'
+name: 'flights_dbt'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
-profile: 'qsi_snowflake'
+profile: 'flights_snowflake'
 
-# These configurations specify where dbt should look for different types of files.
-# The `model-paths` config, for example, states that models in this project can be
-# found in the "models/" directory. You probably won't need to change these!
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -19,25 +11,12 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-clean-targets:         # directories to be removed by `dbt clean`
+clean-targets:
   - "target"
   - "dbt_packages"
 
-
-# Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
-
-vars:
-  'buffer_in_mins': '180' #Used with DATEADD(MINUTE,-'{{{{ buffer_in_mins }}}}',(select max(LAST_COMMIT_TIME) from {{{{ this }}}})) in Models to avoid missing records
-  'hour_1': '05:45'
-  'hour_2': '09:45'
-  'hour_3': '14:45'
-
-# In this example config, we tell dbt to build all models in the example/
-# directory as views. These settings can be overridden in the individual model
-# files using the `{{ config(...) }}` macro.
 models:
-  cr_dbt:
+  flights_dbt:
     +materialized: view
 
     staging:
@@ -47,8 +26,3 @@ models:
     marts:
       +schema: MART
       +materialized: table
-
-seeds:
-  +quote_columns: false
-  cr_dbt:
-    schema: DBT_WORKSPACE

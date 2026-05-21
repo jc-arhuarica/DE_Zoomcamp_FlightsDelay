@@ -33,8 +33,8 @@ tasks:
       os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/workspace/keys/gcp-key.json"
 
       LOCAL_DIR = Path("/workspace/data")
-      BUCKET_NAME = "de-zoomcamp-flightsdelay-data"
-      GCS_PREFIX = "flights/raw"
+      BUCKET_NAME = "de-zoomcamp-flightsdelay-jc-arhuarica"
+      GCS_PREFIX = "flights/raw/flights_delay"
 
       LOCAL_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -65,18 +65,20 @@ tasks:
   type: io.kestra.plugin.jdbc.snowflake.Query
 
   url: jdbc:snowflake://ub53849.sa-east-1.aws.snowflakecomputing.com
-  username: SERVICE_USER_DBT
+  username: SERVICE_USER_DBT_ACCOUNT
   privateKey: "{{ kv('SNOWFLAKE_PRIVATE_KEY') }}"
 
   role: SYSADMIN
-  warehouse: COMPUTE_WH
-  database: FLIGHTS_DB
+  warehouse: DEV_WH
+  database: DE_ZOOMCAMP_FLIGHTS_DB
   schema: RAW
 
   sql: |
-    COPY INTO flights_delay
-    FROM @flights_gcs_stage
-    FILE_FORMAT = (FORMAT_NAME = flights_csv_format)
+    COPY INTO DE_ZOOMCAMP_FLIGHTS_DB.RAW.FLIGHTS_DELAY
+    FROM @DE_ZOOMCAMP_FLIGHTS_DB.RAW.FLIGHTS_DELAY_STAGE
+    FILE_FORMAT = (
+        FORMAT_NAME = DE_ZOOMCAMP_FLIGHTS_DB.RAW.FLIGHTS_DELAY_FORMAT
+    )
     ON_ERROR = 'CONTINUE';
 
 
@@ -104,16 +106,16 @@ tasks:
     - mkdir -p ~/.dbt
     - |
       cat <<EOF > ~/.dbt/profiles.yml
-      qsi_snowflake:
+      flights_snowflake:
         target: dev
         outputs:
           dev:
             type: snowflake
             account: ub53849.sa-east-1.aws
-            user: SERVICE_USER_DBT
+            user: SERVICE_USER_DBT_ACCOUNT
             role: SYSADMIN
-            database: FLIGHTS_DB
-            warehouse: COMPUTE_WH
+            database: DE_ZOOMCAMP_FLIGHTS_DB
+            warehouse: DEV_WH
             schema: STAGING
             threads: 4
             authenticator: snowflake_jwt
@@ -131,19 +133,19 @@ tasks:
   type: io.kestra.plugin.jdbc.snowflake.Query
 
   url: jdbc:snowflake://ub53849.sa-east-1.aws.snowflakecomputing.com
-  username: SERVICE_USER_DBT
+  username: SERVICE_USER_DBT_ACCOUNT
   privateKey: "{{ kv('SNOWFLAKE_PRIVATE_KEY') }}"
 
   role: SYSADMIN
-  warehouse: COMPUTE_WH
-  database: FLIGHTS_DB
+  warehouse: DEV_WH
+  database: DE_ZOOMCAMP_FLIGHTS_DB
   schema: MART
 
   sql: |
-    COPY INTO @FLIGHTS_DB.MART.fct_flights_gcs_stage/fct_flight_delays_{{ execution.id }}/
+    COPY INTO @DE_ZOOMCAMP_FLIGHTS_DB.MART.FCT_FLIGHTS_DELAY_STAGE/fct_flight_delays_{{ execution.id }}/
     FROM (
         SELECT *
-        FROM FLIGHTS_DB.MART.FCT_FLIGHT_DELAYS
+        FROM DE_ZOOMCAMP_FLIGHTS_DB.MART.FCT_FLIGHT_DELAYS
     )
     FILE_FORMAT = (
         TYPE = CSV
@@ -158,19 +160,19 @@ tasks:
   type: io.kestra.plugin.jdbc.snowflake.Query
 
   url: jdbc:snowflake://ub53849.sa-east-1.aws.snowflakecomputing.com
-  username: SERVICE_USER_DBT
+  username: SERVICE_USER_DBT_ACCOUNT
   privateKey: "{{ kv('SNOWFLAKE_PRIVATE_KEY') }}"
 
   role: SYSADMIN
-  warehouse: COMPUTE_WH
-  database: FLIGHTS_DB
+  warehouse: DEV_WH
+  database: DE_ZOOMCAMP_FLIGHTS_DB
   schema: MART
 
   sql: |
-    COPY INTO @FLIGHTS_DB.MART.dim_delay_causes_gcp_stage/dim_delay_causes_{{ execution.id }}/
+    COPY INTO @DE_ZOOMCAMP_FLIGHTS_DB.MART.DIM_DELAY_CAUSES_STAGE/dim_delay_causes_{{ execution.id }}/
     FROM (
         SELECT *
-        FROM FLIGHTS_DB.MART.DIM_DELAY_CAUSES
+        FROM DE_ZOOMCAMP_FLIGHTS_DB.MART.DIM_DELAY_CAUSES
     )
     FILE_FORMAT = (
         TYPE = CSV
@@ -208,7 +210,7 @@ tasks:
 
       os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/workspace/keys/gcp-key.json"
 
-      PROJECT_ID = "kestra-sandbox-487804"
+      PROJECT_ID = "de-zoomcamp-flightsdelay-dev"
       DATASET_ID = "flights_dataset"
 
       def load_table(table_id, gcs_uri):
@@ -248,7 +250,7 @@ tasks:
     - |
       python load_to_bigquery.py \
         --table fct_flight_delays \
-        --uri "gs://de-zoomcamp-flightsdelay-data/flights/mart/fct_flights_gcs_stage/fct_flight_delays_{{ execution.id }}/*.csv"
+        --uri "gs://de-zoomcamp-flightsdelay-jc-arhuarica/flights/mart/fct_flights_delay_stage/fct_flight_delays_{{ execution.id }}/*.csv"
 
 
 # LOAD DIM TABLE INTO BIGQUERY
@@ -277,7 +279,7 @@ tasks:
 
       os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/workspace/keys/gcp-key.json"
 
-      PROJECT_ID = "kestra-sandbox-487804"
+      PROJECT_ID = "de-zoomcamp-flightsdelay-dev"
       DATASET_ID = "flights_dataset"
 
       def load_table(table_id, gcs_uri):
@@ -317,4 +319,4 @@ tasks:
     - |
       python load_to_bigquery_dim.py \
         --table dim_delay_causes \
-        --uri "gs://de-zoomcamp-flightsdelay-data/flights/mart/dim_delay_causes_gcp_stage/dim_delay_causes_{{ execution.id }}/*.csv"
+        --uri "gs://de-zoomcamp-flightsdelay-jc-arhuarica/flights/mart/dim_delay_causes_stage/dim_delay_causes_{{ execution.id }}/*.csv"

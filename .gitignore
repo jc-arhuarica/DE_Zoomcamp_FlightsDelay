@@ -1,14 +1,31 @@
-# Python env
+# Python
 .data_eng_env/
-venv/
+__pycache__/
+*.pyc
+
+# Env
+.env
+!.env.example
+
+# Keys
+keys/
+keys/*.json
+keys/*.p8
+keys/*.pub
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
 
 # dbt
-models_dbt/target/
+target/
+logs/
 dbt_packages/
 
-# Secrets
-keys/
-logs/
-*.p8
-*.key
-.env
+# IDE
+.vscode/
+
+# OS
+.DS_Store

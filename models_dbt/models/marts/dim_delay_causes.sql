@@ -4,7 +4,7 @@
 
 WITH base AS (
     SELECT *
-    FROM {{ ref('fct_flight_delays') }}
+    FROM {{ ref('fct_flights_delay') }}
 ),
 
 totals AS (

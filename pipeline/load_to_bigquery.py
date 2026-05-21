@@ -2,7 +2,7 @@ from google.cloud import bigquery
 import os
 import argparse
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/workspace/keys/gcp-key.json"
+#os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/workspace/keys/gcp-key.json"
 
 PROJECT_ID = "kestra-sandbox-487804"
 DATASET_ID = "flights_dataset"

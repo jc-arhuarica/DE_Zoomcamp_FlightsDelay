@@ -1,19 +1,32 @@
 {
-	"name": "Python 3",
-	"image": "mcr.microsoft.com/devcontainers/python:1-3.11-bullseye",
-    "postCreateCommand": "chmod +x .devcontainer/env_setup.sh && bash ./.devcontainer/env_setup.sh && chmod +x .devcontainer/exports.sh && bash ./.devcontainer/exports.sh",
-	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"mechatroner.rainbow-csv",
-				"VisualStudioExptTeam.vscodeintellicode",
-				"donjayamanne.python-environment-manager",
-				"innoverio.vscode-dbt-power-user"
-			]
-		},
-		"settings": {
-			"pythonPath": "/workspaces/DE_Zoomcamp_FlightsDelay/.data_eng_env/bin/python"
-		}
-	}
+  "name": "Data Engineering Environment",
+
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bullseye",
+
+  "postCreateCommand":
+    "chmod +x .devcontainer/env_setup.sh && bash .devcontainer/env_setup.sh",
+
+  "postStartCommand":
+    "git config --global --add safe.directory ${containerWorkspaceFolder}",
+
+  "containerEnv": {
+    "ENV_FILE": "${containerWorkspaceFolder}/.env"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "mechatroner.rainbow-csv",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "donjayamanne.python-environment-manager",
+        "innoverio.vscode-dbt-power-user",
+        "hashicorp.terraform"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/workspaces/DE_Zoomcamp_FlightsDelay/.data_eng_env/bin/python",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
 }

@@ -37,18 +37,7 @@ def download_kaggle_dataset():
 
 
 # ==============================
-# STEP 2: UNZIP FILE
-# ==============================
-
-def unzip_file(zip_path: Path, extract_to: Path):
-    print(f"Extracting {zip_path}...")
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_to)
-    print(f"Extracted to {extract_to}")
-
-
-# ==============================
-# STEP 3: UPLOAD TO GCS
+# STEP 2: UPLOAD TO GCS
 # ==============================
 
 def upload_to_gcs(bucket_name: str, source_file: Path, destination_blob: str):
@@ -78,10 +67,7 @@ def main():
     # Step 1: Download
     download_kaggle_dataset()
 
-    # Step 2: Extract
-    #unzip_file(zip_path, extract_dir)
-
-    # Step 3: Upload all CSV files to GCS
+    # Step 2: Upload all CSV files to GCS
     for file in LOCAL_DIR.glob("*.csv"):
         destination = f"{GCS_PREFIX}/{file.name}"
         upload_to_gcs(BUCKET_NAME, file, destination)
