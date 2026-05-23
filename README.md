@@ -27,21 +27,9 @@ All infrastructure and workflows are defined as code using Kestra YAML pipelines
 
 ---
 
-## 🔄 Architecture Diagram
-```
-GCS (Raw Files)
-↓
-Snowflake (RAW → STAGING → MART)
-↓
-dbt Transformations
-↓
-GCS (Exported Tables)
-↓
-BigQuery (Analytics Layer)
-↓
-Dashboard (Looker Studio)
-```
+## 🔄 High-Level Architecture
 
+<img width="5364" height="1804" alt="image" src="https://github.com/user-attachments/assets/c28eef1f-5434-4e4e-9967-a8f15cdb3cdf" />
 
 ---
 
