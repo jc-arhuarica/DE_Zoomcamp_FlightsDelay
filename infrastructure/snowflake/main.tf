@@ -89,6 +89,26 @@ resource "snowflake_storage_integration" "gcs_integration" {
 }
 
 #####################################
+# STORAGE INTEGRATION GRANTS
+#####################################
+
+resource "snowflake_grant_privileges_to_account_role" "sysadmin_storage_integration_usage" {
+  provider = snowflake.accountadmin
+
+  privileges        = ["USAGE"]
+  account_role_name = "SYSADMIN"
+
+  on_account_object {
+    object_type = "INTEGRATION"
+    object_name = snowflake_storage_integration.gcs_integration.name
+  }
+
+  depends_on = [
+    snowflake_storage_integration.gcs_integration
+  ]
+}
+
+#####################################
 # STAGES
 #####################################
 

@@ -142,10 +142,10 @@ tasks:
   schema: MART
 
   sql: |
-    COPY INTO @DE_ZOOMCAMP_FLIGHTS_DB.MART.FCT_FLIGHTS_DELAY_STAGE/fct_flight_delays_{{ execution.id }}/
+    COPY INTO @DE_ZOOMCAMP_FLIGHTS_DB.MART.FCT_FLIGHTS_DELAY_STAGE/fct_flights_delay_{{ execution.id }}/
     FROM (
         SELECT *
-        FROM DE_ZOOMCAMP_FLIGHTS_DB.MART.FCT_FLIGHT_DELAYS
+        FROM DE_ZOOMCAMP_FLIGHTS_DB.MART.FCT_FLIGHTS_DELAY
     )
     FILE_FORMAT = (
         TYPE = CSV
@@ -249,8 +249,8 @@ tasks:
     # run load
     - |
       python load_to_bigquery.py \
-        --table fct_flight_delays \
-        --uri "gs://de-zoomcamp-flightsdelay-jc-arhuarica/flights/mart/fct_flights_delay_stage/fct_flight_delays_{{ execution.id }}/*.csv"
+        --table fct_flights_delay \
+        --uri "gs://de-zoomcamp-flightsdelay-jc-arhuarica/flights/mart/fct_flights_delay/fct_flights_delay_{{ execution.id }}/*.csv"
 
 
 # LOAD DIM TABLE INTO BIGQUERY
@@ -319,4 +319,4 @@ tasks:
     - |
       python load_to_bigquery_dim.py \
         --table dim_delay_causes \
-        --uri "gs://de-zoomcamp-flightsdelay-jc-arhuarica/flights/mart/dim_delay_causes_stage/dim_delay_causes_{{ execution.id }}/*.csv"
+        --uri "gs://de-zoomcamp-flightsdelay-jc-arhuarica/flights/mart/dim_delay_causes/dim_delay_causes_{{ execution.id }}/*.csv"
