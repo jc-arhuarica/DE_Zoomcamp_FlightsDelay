@@ -1,5 +1,15 @@
 # ✈️ Flights Delay Analytics Pipeline (End-to-End Data Engineering Project)
 
+## Project Overview
+
+This project builds a cloud-based end-to-end flight delay analytics pipeline.
+
+The pipeline ingests raw data from Kaggle into Google Cloud Storage, processes and transforms it in Snowflake using dbt, exports curated datasets to BigQuery, and serves business intelligence dashboards in Looker Studio.
+
+The workflow is orchestrated using Kestra and infrastructure is managed through Terraform.
+
+---
+
 ## 📌 Problem Description
 
 Flight delays are a major operational and financial issue for airlines and passengers. The goal of this project is to build an end-to-end data engineering pipeline that processes raw flight delay data, transforms it into analytics-ready datasets, and makes it available for business intelligence and decision-making.
@@ -13,7 +23,14 @@ The final output is a cloud-based analytics pipeline with automated ingestion, t
 
 ---
 
-## ☁️ Cloud Architecture
+## 🔄 High-Level Architecture
+
+<img width="5364" height="1804" alt="image" src="https://github.com/user-attachments/assets/1114aecc-452e-4276-bfc5-ef36960aa2be" />
+
+
+---
+
+## 🚀 Technologies Used
 
 This project is fully developed in the cloud using:
 
@@ -22,14 +39,9 @@ This project is fully developed in the cloud using:
 - **BigQuery** → Analytics serving layer
 - **Kestra** → Workflow orchestration (Infrastructure-as-Code style pipelines)
 - **dbt** → Data transformations
+- **Terraform** → Infrastructure as Code (IaC) tool.
 
-All infrastructure and workflows are defined as code using Kestra YAML pipelines.
-
----
-
-## 🔄 High-Level Architecture
-
-<img width="5364" height="1804" alt="image" src="https://github.com/user-attachments/assets/c28eef1f-5434-4e4e-9967-a8f15cdb3cdf" />
+All infrastructure and workflows are defined as code using Kestra YAML pipelines and Terraform.
 
 ---
 
@@ -79,6 +91,9 @@ A derived flight_date column (from year and month) is used to simulate partition
 - Faster query execution
 - Lower compute cost
 
+<img width="3164" height="2084" alt="image" src="https://github.com/user-attachments/assets/09791de4-2215-433f-9919-f0aac41c7c91" />
+
+
 ---
 
 ## 🔧 Transformations (dbt)
@@ -109,7 +124,7 @@ A Looker Studio dashboard is built on top of BigQuery with:
 
 Interactive dashboard built with Looker Studio:
 
-👉 [https://lookerstudio.google.com/reporting/FlightsDelayDashboard](https://datastudio.google.com/reporting/3ca21ab7-60e1-44a5-89b3-06a8134379eb)
+👉 [View Dashboard](https://datastudio.google.com/reporting/3ca21ab7-60e1-44a5-89b3-06a8134379eb)
 
 ---
 
@@ -148,15 +163,54 @@ Snowflake MART tables
 GCS exported files
 BigQuery dataset: flights_dataset
 
+---
 
-## 🚀 Technologies Used
-Snowflake
-Google Cloud Storage
-BigQuery
-dbt
-Kestra
-Python
-SQL
+## 📁 Project Structure
+
+The repository is organized into modular components for infrastructure, orchestration, transformation, and analytics delivery.
+
+### Key Components
+- **infrastructure/** → Terraform code for provisioning GCP and Snowflake resources
+- **kestra/** → Workflow orchestration pipelines
+- **models_dbt/** → Data transformation logic (staging + marts)
+- **pipeline/** → Python scripts for ingestion and BigQuery loading
+- **data/** → Local storage for raw or sample datasets
+
+```text
+DE_ZOOMCAMP_FLIGHTSDELAY/
+│
+├── .devcontainer/              # Development container setup
+│
+├── infrastructure/             # Infrastructure as Code (Terraform)
+│   ├── gcp/
+│   └── snowflake/
+│
+├── kestra/
+│   └── flows/
+│       └── flights_pipeline.yml
+│
+├── models_dbt/                 # dbt transformation project
+│   ├── macros/
+│   ├── models/
+│   │   ├── staging/
+│   │   └── marts/
+│   ├── dbt_project.yml
+│   └── profiles.yml
+│
+├── pipeline/                   # Python ingestion/export scripts
+│   ├── ingest_flights_data.py
+│   └── load_to_bigquery.py
+│
+├── data/                       # Local sample/raw data
+│
+├── .env.example                # Environment variables template
+├── docker-compose.yml          # Local orchestration setup
+├── requirements.txt            # Python dependencies
+├── README.md
+└── LICENSE.txt
+```
+
+---
 
 ## 📌 Future Improvements
 Add streaming ingestion (Kafka or Pub/Sub)
