@@ -120,7 +120,13 @@ A Looker Studio dashboard is built on top of BigQuery with:
 - Interactive filters (airline, airport, date)
 - Comparative analysis across carriers
 
-Interactive dashboard built with Looker Studio:
+
+### Dashboard Preview
+<img width="1066" height="807" alt="image" src="https://github.com/user-attachments/assets/f2174cea-e3d6-4636-8cd6-2d471ae97f25" />
+<img width="1066" height="807" alt="image" src="https://github.com/user-attachments/assets/e4472fdf-6c8d-47d3-9c5f-354880e85139" />
+
+
+#### Interactive dashboard built with Looker Studio:
 
 👉 [View Dashboard](https://datastudio.google.com/reporting/3ca21ab7-60e1-44a5-89b3-06a8134379eb)
 
