@@ -138,30 +138,214 @@ Batch ingestion pipeline:
 
 ## 🔁 Reproducibility
 
+Follow the steps below to reproduce the project from scratch.
+
 ### Prerequisites
+
+Required accounts and tools:
+
+- Google Cloud Project
 - Snowflake account
-- Google Cloud project
+- Kaggle account
 - Kestra instance
+- Docker + VS Code Dev Containers
 
-### Setup Steps
+---
 
-1. Clone repository
+### 1. Clone Repository
+
 ```bash
 git clone https://github.com/JC-CC-UNI/DE_Zoomcamp_FlightsDelay.git
+cd DE_Zoomcamp_FlightsDelay
 ```
-2. Configure Kestra KV store:
-SNOWFLAKE_PRIVATE_KEY
+
+---
+
+### 2. Open in Dev Container
+
+This project uses a fully configured development container.
+
+Open the repository in VS Code:
+
+```text
+Command Palette → Dev Containers: Reopen in Container
+```
+
+The container automatically installs:
+
+- Terraform
+- Google Cloud SDK
+- dbt
+- Python dependencies
+
+---
+
+### 3. Authenticate GCP
+
+Create a Terraform service account with sufficient permissions.
+
+Example:
+
+```bash
+gcloud auth login
+gcloud config set project <your-project-id>
+```
+
+---
+
+### 4. Provision Infrastructure (Terraform)
+
+Provision cloud resources.
+
+#### GCP Infrastructure
+
+```bash
+cd infrastructure/gcp
+
+terraform init
+terraform plan
+terraform apply
+```
+
+#### Snowflake Infrastructure
+
+```bash
+cd ../snowflake
+
+terraform init
+terraform plan
+terraform apply
+```
+
+This creates:
+
+- GCS buckets
+- BigQuery datasets
+- Snowflake integrations
+- IAM resources
+- Pipeline service account
+
+---
+
+### 5. Generate Pipeline Service Account Key
+
+Generate the runtime service account key:
+
+```bash
+gcloud iam service-accounts keys create \
+~/flights-pipeline-sa-key.json \
+--iam-account=flights-pipeline-sa@<project-id>.iam.gserviceaccount.com
+```
+
+Move the key into:
+
+```text
+keys/flights-pipeline-sa-key.json
+```
+
+---
+
+### 6. Configure Kestra KV Store
+
+Create the following KV variables in Kestra:
+
+| Key | Description |
+|------|-------------|
+| `GCP_SERVICE_ACCOUNT_JSON_B64` | Base64-encoded pipeline service account JSON |
+| `KAGGLE_API_TOKEN` | Kaggle API token |
+| `SNOWFLAKE_PRIVATE_KEY` | RSA private key for Snowflake authentication |
+
+Generate the base64 value:
+
+```bash
+cat keys/flights-pipeline-sa-key.json | base64
+```
+
+Copy the output into:
+
+```text
 GCP_SERVICE_ACCOUNT_JSON_B64
-
-3. Run Kestra flow:
-```
-flights_pipeline.yml
 ```
 
-4. Verify outputs:
-Snowflake MART tables
-GCS exported files
-BigQuery dataset: flights_dataset
+---
+
+### 7. Configure Environment Variables
+
+Create `.env` file:
+
+```bash
+cp .env.example .env
+```
+
+Populate required variables.
+
+---
+
+### 8. Deploy Kestra Flow
+
+Open Kestra UI.
+
+Create a new flow and paste:
+
+```text
+kestra/flows/flights_pipeline.yml
+```
+
+Save the flow.
+
+---
+
+### 9. Execute Pipeline
+
+Run the Kestra flow manually.
+
+Pipeline stages:
+
+```text
+Kaggle
+   ↓
+GCS (raw)
+   ↓
+Snowflake RAW
+   ↓
+dbt STAGING
+   ↓
+dbt MART
+   ↓
+Snowflake Export Stage
+   ↓
+GCS (processed)
+   ↓
+BigQuery
+   ↓
+Looker Studio
+```
+
+---
+
+### 10. Verify Outputs
+
+Successful execution should generate:
+
+#### Snowflake
+- `RAW.FLIGHTS_DELAY`
+- `STAGING.STG_FLIGHTS`
+- `MART.FCT_FLIGHTS_DELAY`
+- `MART.DIM_DELAY_CAUSES`
+
+#### GCS
+- Raw files
+- Processed exports
+
+#### BigQuery
+Dataset:
+```text
+flights_dataset
+```
+
+#### Dashboard
+Looker Studio dashboard populated with data.
+
 
 ---
 
