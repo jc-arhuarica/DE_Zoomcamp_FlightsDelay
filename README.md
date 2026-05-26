@@ -25,7 +25,8 @@ The final output is a cloud-based analytics pipeline with automated ingestion, t
 
 ## 🔄 High-Level Architecture
 
-<img width="5364" height="1804" alt="image" src="https://github.com/user-attachments/assets/1114aecc-452e-4276-bfc5-ef36960aa2be" />
+<img width="5364" height="2084" alt="image" src="https://github.com/user-attachments/assets/eadbebc2-5ee6-4a6f-876e-b1a8d7fa1c15" />
+
 
 
 ---
@@ -155,7 +156,7 @@ Required accounts and tools:
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/JC-CC-UNI/DE_Zoomcamp_FlightsDelay.git
+git clone https://github.com/jc-arhuarica/DE_Zoomcamp_FlightsDelay.git
 cd DE_Zoomcamp_FlightsDelay
 ```
 
