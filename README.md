@@ -90,7 +90,10 @@ A derived flight_date column (from year and month) is used to simulate partition
 - Faster query execution
 - Lower compute cost
 
-<img width="3864" height="1844" alt="image" src="https://github.com/user-attachments/assets/e3d7da0a-d789-440a-a033-4e1428c24b09" />
+<!--- <img width="3864" height="1844" alt="image" src="https://github.com/user-attachments/assets/e3d7da0a-d789-440a-a033-4e1428c24b09" />
+<img width="4084" height="2164" alt="image" src="https://github.com/user-attachments/assets/ba04cb2f-e8f3-4e35-acce-92b6650591c7" /> --->
+<img width="4084" height="2164" alt="image" src="https://github.com/user-attachments/assets/523b9054-ae1e-4b37-becc-c8e49303576e" />
+
 
 ---
 
@@ -121,10 +124,18 @@ A Looker Studio dashboard is built on top of BigQuery with:
 - Comparative analysis across carriers
 
 
-### Dashboard Preview
+<!--- ### Dashboard Preview
 <img width="1066" height="807" alt="image" src="https://github.com/user-attachments/assets/f2174cea-e3d6-4636-8cd6-2d471ae97f25" />
 <img width="1066" height="807" alt="image" src="https://github.com/user-attachments/assets/e4472fdf-6c8d-47d3-9c5f-354880e85139" />
+### Dashboard Preview
 
+| | |
+| :---: | :---: |
+| <img src="https://github.com/user-attachments/assets/f2174cea-e3d6-4636-8cd6-2d471ae97f25" width="49%"> | <img src="https://github.com/user-attachments/assets/e4472fdf-6c8d-47d3-9c5f-354880e85139" width="49%"> |--->
+
+### Dashboard Preview
+
+<img src="https://github.com/user-attachments/assets/f2174cea-e3d6-4636-8cd6-2d471ae97f25" width="49%" /> <img src="https://github.com/user-attachments/assets/e4472fdf-6c8d-47d3-9c5f-354880e85139" width="49%" />
 
 #### Interactive dashboard built with Looker Studio:
 
