@@ -25,7 +25,7 @@ The final output is a cloud-based analytics pipeline with automated ingestion, t
 
 ## 🔄 High-Level Architecture
 
-<img width="5364" height="2084" alt="image" src="https://github.com/user-attachments/assets/643a603c-0455-466f-9755-24c560b0c59a" />
+<img width="5364" height="2084" alt="image" src="https://github.com/user-attachments/assets/22152808-3af5-4f54-a916-a1aab5fe9038" />
 
 ---
 
