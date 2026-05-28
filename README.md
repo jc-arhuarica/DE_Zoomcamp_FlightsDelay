@@ -44,6 +44,57 @@ All infrastructure and workflows are defined as code using Kestra YAML pipelines
 
 ---
 
+## 🔐 Security & Access Design
+
+The project follows a **least-privilege architecture** by separating infrastructure provisioning from pipeline execution.
+
+### Service Accounts
+
+#### Terraform Service Account
+`de-zoomcamp-flightsdelay-tf`
+
+Used only for infrastructure provisioning through Terraform.
+
+Responsibilities:
+- Create GCS buckets
+- Create BigQuery datasets
+- Configure IAM roles
+- Provision Snowflake integrations
+
+This account has elevated permissions but is never used during data processing.
+
+#### Pipeline Service Account
+`flights-pipeline-sa`
+
+Used by Kestra workflows and Python ingestion jobs.
+
+Responsibilities:
+- Upload files to GCS
+- Load data into BigQuery
+- Access Snowflake integrations
+
+This account has limited permissions and follows least-privilege principles.
+
+### Authentication Flow
+
+```text
+Terraform Service Account
+        ↓ provisions infrastructure
+
+Pipeline Service Account
+        ↓ executes ingestion
+
+Kestra
+    ↓
+Snowflake
+    ↓
+dbt
+    ↓
+GCS
+    ↓
+BigQuery
+```
+---
 ## ⚙️ Workflow Orchestration (Kestra)
 
 The pipeline includes the following automated steps:
@@ -378,11 +429,18 @@ The repository is organized into modular components for infrastructure, orchestr
 ```text
 DE_ZOOMCAMP_FLIGHTSDELAY/
 │
-├── .devcontainer/              # Development container setup
+├── .devcontainer/              # VSCode DevContainer setup
 │
-├── infrastructure/             # Infrastructure as Code (Terraform)
+├── infrastructure/             # Terraform IaC
 │   ├── gcp/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── provider.tf
+│   │
 │   └── snowflake/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── providers.tf
 │
 ├── kestra/
 │   └── flows/
@@ -400,14 +458,15 @@ DE_ZOOMCAMP_FLIGHTSDELAY/
 │   ├── ingest_flights_data.py
 │   └── load_to_bigquery.py
 │
-├── data/                       # Local sample/raw data
+├── data/                       # Optional local raw/sample files
 │
-├── .env.example                # Environment variables template
-├── docker-compose.yml          # Local orchestration setup
-├── requirements.txt            # Python dependencies
+├── .env.example                # Environment variable template
+├── docker-compose.yml          # Kestra local deployment
+├── requirements.txt
 ├── README.md
 └── LICENSE.txt
 ```
+
 
 ---
 
