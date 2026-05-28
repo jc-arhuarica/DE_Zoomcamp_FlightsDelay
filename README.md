@@ -210,7 +210,7 @@ Follow the steps below to reproduce the project from scratch.
 
 Required accounts and tools:
 
-- Google Cloud Project
+- Google Cloud account
 - Snowflake account
 - Kaggle account
 - Kestra instance
@@ -246,20 +246,191 @@ The container automatically installs:
 
 ---
 
-### 3. Authenticate GCP
+### 3. Authenticate with Google Cloud
 
-Create a Terraform service account with sufficient permissions.
-
-Example:
+Login to Google Cloud:
 
 ```bash
 gcloud auth login
-gcloud config set project <your-project-id>
+```
+
+List available accounts:
+
+```bash
+gcloud auth list
+```
+
+Set your billing-enabled account if needed:
+
+```bash
+gcloud config set account <your-email>
 ```
 
 ---
 
-### 4. Provision Infrastructure (Terraform)
+### 4. Create Google Cloud Project
+
+Create a new project:
+
+```bash
+gcloud projects create de-zoomcamp-flightsdelay-dev
+```
+
+Set the project:
+
+```bash
+gcloud config set project de-zoomcamp-flightsdelay-dev
+```
+
+Enable required APIs:
+
+```bash
+gcloud services enable \
+iam.googleapis.com \
+cloudresourcemanager.googleapis.com \
+serviceusage.googleapis.com \
+storage.googleapis.com \
+bigquery.googleapis.com
+```
+
+---
+
+### 5. Create Terraform Service Account
+
+Create the Terraform service account:
+
+```bash
+gcloud iam service-accounts create \
+de-zoomcamp-flightsdelay-tf \
+--display-name="Terraform Service Account"
+```
+
+Assign required roles:
+
+<!--- ```bash
+PROJECT_ID=de-zoomcamp-flightsdelay-dev
+TF_SA="de-zoomcamp-flightsdelay-tf@$PROJECT_ID.iam.gserviceaccount.com"
+
+for role in \
+roles/bigquery.admin \
+roles/resourcemanager.projectIamAdmin \
+roles/iam.serviceAccountAdmin \
+roles/iam.serviceAccountKeyAdmin \
+roles/serviceusage.serviceUsageAdmin \
+roles/storage.admin
+do
+  gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member="serviceAccount:$TF_SA" \
+    --role="$role"
+done
+```--->
+```bash
+gcloud projects add-iam-policy-binding de-zoomcamp-flightsdelay-dev \
+--member="serviceAccount:de-zoomcamp-flightsdelay-tf@de-zoomcamp-flightsdelay-dev.iam.gserviceaccount.com" \
+--role="roles/bigquery.admin"
+
+gcloud projects add-iam-policy-binding de-zoomcamp-flightsdelay-dev \
+--member="serviceAccount:de-zoomcamp-flightsdelay-tf@de-zoomcamp-flightsdelay-dev.iam.gserviceaccount.com" \
+--role="roles/storage.admin"
+
+gcloud projects add-iam-policy-binding de-zoomcamp-flightsdelay-dev \
+--member="serviceAccount:de-zoomcamp-flightsdelay-tf@de-zoomcamp-flightsdelay-dev.iam.gserviceaccount.com" \
+--role="roles/iam.serviceAccountAdmin"
+
+gcloud projects add-iam-policy-binding de-zoomcamp-flightsdelay-dev \
+--member="serviceAccount:de-zoomcamp-flightsdelay-tf@de-zoomcamp-flightsdelay-dev.iam.gserviceaccount.com" \
+--role="roles/iam.serviceAccountKeyAdmin"
+
+gcloud projects add-iam-policy-binding de-zoomcamp-flightsdelay-dev \
+--member="serviceAccount:de-zoomcamp-flightsdelay-tf@de-zoomcamp-flightsdelay-dev.iam.gserviceaccount.com" \
+--role="roles/serviceusage.serviceUsageAdmin"
+
+gcloud projects add-iam-policy-binding de-zoomcamp-flightsdelay-dev \
+--member="serviceAccount:de-zoomcamp-flightsdelay-tf@de-zoomcamp-flightsdelay-dev.iam.gserviceaccount.com" \
+--role="roles/resourcemanager.projectIamAdmin"
+```
+
+Generate Terraform SA key:
+
+<!--- ```bash
+gcloud iam service-accounts keys create \
+~/gcp-key.json \
+--iam-account=$TF_SA
+```--->
+```bash
+gcloud iam service-accounts keys create \
+~/gcp-key.json \
+--iam-account=de-zoomcamp-flightsdelay-tf@de-zoomcamp-flightsdelay-dev.iam.gserviceaccount.com
+```
+
+Move the key:
+
+```bash
+mkdir -p keys
+mv ~/gcp-key.json keys/gcp-key.json
+```
+
+Authenticate using Terraform SA:
+
+```bash
+gcloud auth activate-service-account \
+--key-file=keys/gcp-key.json
+```
+
+Verify authentication:
+
+```bash
+gcloud auth list
+```
+
+---
+
+### 6. Generate Snowflake RSA Keys
+
+Generate RSA private and public keys used for Snowflake key-pair authentication.
+
+Private key:
+
+```bash
+openssl genrsa 2048 | \
+openssl pkcs8 -topk8 \
+-inform PEM \
+-out keys/rsa_key.p8 \
+-nocrypt
+```
+
+Public key:
+
+```bash
+openssl rsa \
+-in keys/rsa_key.p8 \
+-pubout \
+-out keys/rsa_key.pub
+```
+
+Verify generated files:
+
+```text
+keys/
+├── rsa_key.p8
+└── rsa_key.pub
+```
+
+These keys are used by Terraform to provision the Snowflake service user:
+
+```text
+SERVICE_USER_DBT_ACCOUNT
+```
+
+The public key is automatically injected through:
+
+```text
+TF_VAR_rsa_public_key
+```
+
+---
+
+### 7. Provision Infrastructure (Terraform)
 
 Provision cloud resources.
 
@@ -293,7 +464,7 @@ This creates:
 
 ---
 
-### 5. Generate Pipeline Service Account Key
+### 8. Generate Pipeline Service Account Key
 
 Generate the runtime service account key:
 
@@ -306,12 +477,47 @@ gcloud iam service-accounts keys create \
 Move the key into:
 
 ```text
-keys/flights-pipeline-sa-key.json
+mv ~/flights-pipeline-sa-key.json keys/flights-pipeline-sa-key.json
 ```
 
 ---
 
-### 6. Configure Kestra KV Store
+### 10. Start Kestra Locally (Docker Compose)
+
+This project runs Kestra locally using Docker Compose.
+
+Start Kestra services:
+
+```bash
+docker compose up -d
+```
+Verify containers are running:
+```bash
+docker ps
+```
+
+Expected services:
+
+```text
+kestra
+kestra_postgres
+```
+
+Access Kestra UI:
+```text
+http://localhost:8080
+```
+
+Default credentials:
+
+```text
+Username: admin@kestra.io
+Password: Admin1234!
+```
+
+---
+
+### 9. Configure Kestra KV Store
 
 Create the following KV variables in Kestra:
 
@@ -335,7 +541,7 @@ GCP_SERVICE_ACCOUNT_JSON_B64
 
 ---
 
-### 7. Configure Environment Variables
+### 10. Configure Environment Variables
 
 Create `.env` file:
 
@@ -347,7 +553,7 @@ Populate required variables.
 
 ---
 
-### 8. Deploy Kestra Flow
+### 11. Deploy Kestra Flow
 
 Open Kestra UI.
 
@@ -361,7 +567,7 @@ Save the flow.
 
 ---
 
-### 9. Execute Pipeline
+### 12. Execute Pipeline
 
 Run the Kestra flow manually.
 
@@ -389,7 +595,7 @@ Looker Studio
 
 ---
 
-### 10. Verify Outputs
+### 13. Verify Outputs
 
 Successful execution should generate:
 
